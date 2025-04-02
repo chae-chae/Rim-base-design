@@ -22,8 +22,6 @@ export default function ImageAnalysis() {
     if (!file) return;
     setLoading(true);
 
-    // (실제 구현에서는 file을 FormData로 감싸 백엔드에 전송해야 함)
-    // 여기서는 파일명을 기반으로 더미 요청을 보낸다고 가정합니다.
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: {
