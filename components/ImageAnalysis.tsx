@@ -1,4 +1,3 @@
-// components/ImageAnalysis.tsx
 "use client";
 
 import { useState } from "react";
@@ -22,16 +21,26 @@ export default function ImageAnalysis() {
     if (!file) return;
     setLoading(true);
 
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image: file.name }),
-    });
-    const data = await response.json();
-    setAnalysisResult(data);
-    setLoading(false);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setAnalysisResult(data);
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,6 +52,7 @@ export default function ImageAnalysis() {
           <button
             onClick={handleAnalyze}
             className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+            disabled={loading}
           >
             {loading ? "Analyzing..." : "Analyze Image"}
           </button>
