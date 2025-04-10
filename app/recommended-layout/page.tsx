@@ -10,16 +10,20 @@ export default function RecommendedLayoutPage() {
 
   const generateLayout = async () => {
     setLoading(true);
-    // 더미 데이터 요청: 실제로는 사용자의 모듈 데이터 등을 함께 보내야 합니다.
-    const response = await fetch("/api/recommend", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ modules: [] }), // 추후 모듈 데이터를 보내도록 수정
-    });
-    const data = await response.json();
-    setLayoutData(data.layout);
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/recommend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ modules: [] }), // 추후 사용자 모듈 데이터를 보낼 예정
+      });
+      if (!response.ok) throw new Error("Layout generation failed");
+      const data = await response.json();
+      setLayoutData(data.layout);
+    } catch (error) {
+      console.error("Error generating layout:", error);
+    }
     setLoading(false);
   };
 
@@ -29,6 +33,7 @@ export default function RecommendedLayoutPage() {
       <button
         onClick={generateLayout}
         className="bg-green-600 text-white px-4 py-2 rounded mb-4"
+        disabled={loading}
       >
         {loading ? "Generating..." : "Generate Layout"}
       </button>
