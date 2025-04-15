@@ -13,23 +13,21 @@ export default function RecommendedLayoutPage() {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/recommend", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ modules: [] }), // 추후 사용자 모듈 데이터를 보낼 예정
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ modules: [] }), // 실제 모듈 데이터로 교체 예정
       });
       if (!response.ok) throw new Error("Layout generation failed");
       const data = await response.json();
       setLayoutData(data.layout);
     } catch (error) {
-      console.error("Error generating layout:", error);
+      console.error(error);
     }
     setLoading(false);
   };
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Recommended Layout Generator</h2>
+      <h2 className="text-3xl font-bold mb-4">Recommended Layout Generator</h2>
       <button
         onClick={generateLayout}
         className="bg-green-600 text-white px-4 py-2 rounded mb-4"
