@@ -1,3 +1,4 @@
+// components/ImageAnalysis.tsx
 "use client";
 
 import { useState } from "react";
@@ -29,18 +30,13 @@ export default function ImageAnalysis() {
         method: "POST",
         body: formData,
       });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
+      if (!response.ok) throw new Error("Image analysis failed");
       const data = await response.json();
       setAnalysisResult(data);
     } catch (error) {
       console.error("Error analyzing image:", error);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
