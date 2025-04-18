@@ -1,4 +1,3 @@
-// components/LayoutEditor.tsx
 "use client";
 
 import { useDrop } from "react-dnd";
@@ -19,23 +18,19 @@ export default function LayoutEditor() {
     { id: 5, name: "Storage" },
   ]);
 
-  const [{ isOver }, dropRef] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: "MODULE",
     drop: (item: any) => {
       console.log("Dropped item:", item);
-      // 모듈 위치 업데이트 로직 추가 예정
+      // 나중에 모듈 위치를 실제로 바꾸는 로직 추가 가능
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
   });
 
-  return (
-    <div
-      ref={dropRef}
-      className="border-2 p-4 relative"
-      style={{ minHeight: "400px" }}
-    >
+  return drop(
+    <div className="border-2 p-4 relative min-h-[400px] bg-gray-50 rounded">
       <h3 className="font-bold mb-2">Layout Editor</h3>
       <div className="grid grid-cols-3 gap-4">
         {modules.map((mod) => (

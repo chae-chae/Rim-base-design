@@ -1,4 +1,3 @@
-// components/DraggableModule.tsx
 "use client";
 
 import { useDrag } from "react-dnd";
@@ -9,7 +8,7 @@ interface DraggableModuleProps {
 }
 
 export default function DraggableModule({ id, name }: DraggableModuleProps) {
-  const [{ isDragging }, dragRef] = useDrag({
+  const [{ isDragging }, drag] = useDrag({
     type: "MODULE",
     item: { id },
     collect: (monitor) => ({
@@ -17,11 +16,10 @@ export default function DraggableModule({ id, name }: DraggableModuleProps) {
     }),
   });
 
-  return (
+  return drag(
     <div
-      ref={dragRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="border p-2 rounded"
+      className="border p-2 rounded bg-white shadow cursor-move"
     >
       {name}
     </div>
