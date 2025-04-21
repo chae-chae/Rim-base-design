@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+tensorflow
+Pillow
+numpy
+PyJWT
+sqlalchemy
+psycopg2-binary
