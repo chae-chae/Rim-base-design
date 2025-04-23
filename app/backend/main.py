@@ -1,5 +1,5 @@
 # backend/main.py
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -9,6 +9,8 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 import io
 import os
+
+from backend import design_api
 
 app = FastAPI()
 
@@ -20,7 +22,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = tf.keras.applications.MobileNetV2(weights="imagenet")
+MODEL_PATH = "saved_model"
+if os.path.exists(MODEL_PATH):
+    model = tf.keras.models.load_model(MODEL_PATH)
+else:
+    from tensorflow.keras.applications import MobileNetV2
+    model = MobileNetV2(weights="imagenet")
 
 upload_folder = "backend/uploads"
 os.makedirs(upload_folder, exist_ok=True)
@@ -29,7 +36,6 @@ os.makedirs(upload_folder, exist_ok=True)
 async def analyze_image(file: UploadFile = File(...)):
     try:
         contents = await file.read()
-        
         file_path = os.path.join(upload_folder, file.filename)
         with open(file_path, "wb") as f:
             f.write(contents)
@@ -44,12 +50,29 @@ async def analyze_image(file: UploadFile = File(...)):
         features = [f"{desc}: {round(prob, 2)}" for (_, desc, prob) in decoded]
         
         result = {
-            "layout": "Preliminary layout based on image classification.",
+            "layout": "Model analysis: Predicted layout details based on image.",
             "features": features,
         }
         return JSONResponse(content=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/recommend")
+async def recommend_layout(request: Request):
+    data = await request.json()
+    modules = data.get("modules", [])
+    
+    if modules:
+        recommended_layout = " -> ".join([mod.get("name", "Module") for mod in modules])
+    else:
+        recommended_layout = """
+        [Entrance] -> [Kitchen] -> [Dining Hall]
+                      ↓
+                   [Workshop] -> [Storage]
+        """
+    return JSONResponse(content={"layout": recommended_layout})
+
+app.include_router(design_api.router)
 
 if __name__ == "__main__":
     uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
